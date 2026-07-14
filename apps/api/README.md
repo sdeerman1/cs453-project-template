@@ -35,13 +35,16 @@ npm test ?????
 ```
 
 ## What routes your API supports  
-GET /health: Check server status  
-GET /db-health: Check database connection status  
-GET /tasks: Return all tasks  
-GET /tasks/:id: Return an existing task  
-POST /tasks: Create a new task  
-PATCH /tasks/:id: update an existing task  
-DELETE /tasks/:id: Delete an existing task  
+
+| Method | Route | Description |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET | `/db-health` | Check database connection status |
+| GET | `/tasks` | Return all tasks |
+| GET | `/tasks/:id` | Return an existing task |
+| POST | `/tasks` | Create a new task |
+| PATCH | `/tasks/:id` | Update an existing task  |
+| DELETE | `/tasks/:id` | Delete an existing task  |
 
 ## Example curl commands  
 GET /health:  
@@ -142,7 +145,7 @@ Applications are constantly being changed or updated and separating the logic al
 500: database connection failed  
 
 **4. What happens when a client requests a task ID that does not exist?**  
-The client will send a fetch GET/http://localhost:3000/api/tasks/id. This tells the server to run the get() function. Usint id = what the user input, the server runs an SQL query "SELECT * FROM tasks WHERE id = $1", [requestedID] which means we will select all columns from the tasks table where the ID matches
+The client will send a fetch GET/http://localhost:3000/api/tasks/id. This tells the server to run the get() function. Using id = what the user input, the server runs an SQL query "SELECT * FROM tasks WHERE id = $1", [requestedID] which means we will select all columns from the tasks table where the ID matches
 the one the user entered. We then return the row[s] that correspond with the requested ID. If the ID does not exist, the function will return 0 rows. The client will try to display the rows, but there will be nothing to display. The client then, correctly, displays nothing for a task ID that does not exist. 
 CHECK AND SEE WHAT HAPPENS, WHAT CODE IS RETURNED, ETC.  
 
