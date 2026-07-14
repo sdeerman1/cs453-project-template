@@ -52,14 +52,14 @@ GET /health:
 curl http://localhost:3000/health
 ```
 Output:  
-```{"status":"ok"}```
+```{"status":"ok", "service":"cs453-api"}```
 <br><br><br>
 GET /db-health:  
 ```bash
 curl http://localhost:3000/db-health
 ```
 Output:  
-```{???}```
+```{"status":"ok","database":"connected","currentTime":"2026-07-14T23:21:33.897Z"}```
 <br><br><br>
 POST /tasks:  
 ```bash
