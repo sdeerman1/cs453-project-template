@@ -43,6 +43,84 @@ POST /tasks: Create a new task
 PATCH /tasks/:id: update an existing task  
 DELETE /tasks/:id: Delete an existing task  
 
+## Example curl commands  
+GET /health:  
+```bash
+curl http://localhost:3000/health
+```
+Output:  
+```{"status":"ok"}```
+<br><br><br>
+GET /db-health:  
+```bash
+curl http://localhost:3000/db-health
+```
+Output:  
+```{???}```
+<br><br><br>
+POST /tasks:  
+```bash
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Complete lab 03", "description": "Rest API", "status": "todo"}'
+```
+Output:  
+```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+<br><br><br>
+GET /tasks:  
+```bash
+curl http://localhost:3000/tasks
+```
+Output:  
+```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+<br><br><br>
+GET /tasks/:id:  
+```bash
+curl http://localhost:3000/tasks/2
+```
+Output:  
+```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+<br><br><br>
+PATCH /tasks/:id:  
+```bash
+curl -X PATCH http://localhost:3000/tasks/2 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Final exam"}'
+```
+Output:  
+```{"id":2,"title":"Final exam","description":"Rest API","status":"todo"}```
+<br><br><br>
+PATCH /tasks/:id:  
+```bash
+curl -X PATCH http://localhost:3000/tasks/2 \
+  -H "Content-Type: application/json" \
+  -d '{"description": "Cumulative final exam"}'
+```
+Output:  
+```{"id":2,"title":"Final exam","description":"Cumulative final exam","status":"todo"}```
+<br><br><br>
+PATCH /tasks/:id:  
+```bash
+curl -X PATCH http://localhost:3000/tasks/2 \
+  -H "Content-Type: application/json" \
+  -d '{"status": "completed"}'
+```
+Output: 
+```{"id":2,"title":"Final exam","description":"Cumulative final exam","status":"completed"}```
+<br><br><br>
+PATCH /tasks/:id:  
+```bash
+curl -X PATCH http://localhost:3000/tasks/2 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Midterm", "description": "Midterm exam covering modules 1-3"}'
+```
+Output:  
+```{"id":2,"title":"Midterm","description":"Midterm exam covering modules 1-3","status":"completed"}```
+<br><br><br>
+DELETE /tasks/:id:  
+```bash
+curl -X DELETE http://localhost:3000/tasks/2
+```
 
 ## Reflection Questions
 
