@@ -4,7 +4,7 @@ import { pool } from "./db/pool";
 import * as fs from 'fs';
 import * as path from 'path';
 
-const app = express();
+export const app = express();
 
 app.use(express.json());
 
@@ -37,8 +37,8 @@ app.get("/tasks", async (_req, res) => {
 		const result = await pool.query(
 			`SELECT id,
               title,
-              description,
-              status,
+              description1,
+              status1,
               created_at AS "createdAt",
               updated_at AS "updatedAt"
         FROM tasks
@@ -61,8 +61,8 @@ app.get("/tasks/:id", async (_req, res) => {
 		const result = await pool.query(
 			`SELECT id,
               title,
-              description,
-              status,
+              description1,
+              status1,
               created_at AS "createdAt",
               updated_at AS "updatedAt"
         FROM tasks
@@ -70,7 +70,11 @@ app.get("/tasks/:id", async (_req, res) => {
         [requestedID]
 		);
 
-		res.status(200).json( result.rows );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+		res.status(200).json( result.rows[0] );
 	} catch (error) {
 		console.error("Failed to fetch tasks:", error);
 		res.status(500).json({
@@ -84,9 +88,6 @@ app.post("/tasks", async (_req, res) => {
   const title = _req.body?.title?.trim();
   const description = _req.body?.description?.trim();
   const status = _req.body?.status?.trim();
-  // FIXME: do something for timestamp
-  const created_at = _req.body?.created_at?.trim();
-  const updated_at = _req.body?.updated_at?.trim();
 
   if (!title || !status) {
     return res.status(400).json({
@@ -97,9 +98,9 @@ app.post("/tasks", async (_req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO tasks (title, description, status)
+      `INSERT INTO tasks (title, description1, status1)
       VALUES ($1, $2, $3)
-      RETURNING id, title, description, status, created_at, updated_at`,
+      RETURNING id, title, description1, status1, created_at, updated_at`,
       [title, description, status]
     )
     res.status(201).json({ task: result.rows[0] });
@@ -126,12 +127,17 @@ app.patch("/tasks/:id", async (_req, res) => {
     try {
       const result = await pool.query(
         `UPDATE tasks
-        SET title = $1
-        WHERE id = $2`,
+        SET title = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING id, title, description1, status1, created_at, updated_at`,
         [title, requestedID]
       );
 
-      res.status(200).json({ tasks: result.rows });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      res.json({ task: result.rows[0] });
     } catch (error) {
       console.error("Failed to load items:", error);
       res.status(500).json({
@@ -152,12 +158,17 @@ app.patch("/tasks/:id", async (_req, res) => {
     try {
       const result = await pool.query(
         `UPDATE tasks
-        SET description = $1
-        WHERE id = $2`,
+        SET description1 = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING id, title, description1, status1, created_at, updated_at`,
         [description, requestedID]
       );
 
-      res.status(200).json({ tasks: result.rows });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      res.status(200).json({ task: result.rows[0] });
     } catch (error) {
       console.error("Failed to load items:", error);
       res.status(500).json({
@@ -178,12 +189,17 @@ app.patch("/tasks/:id", async (_req, res) => {
     try {
       const result = await pool.query(
         `UPDATE tasks
-        SET status = $1
-        WHERE id = $2`,
+        SET status1 = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING id, title, description1, status1, created_at, updated_at`,
         [status, requestedID]
       );
 
-      res.status(200).json({ tasks: result.rows });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      res.status(200).json({ task: result.rows[0] });
     } catch (error) {
       console.error("Failed to load items:", error);
       res.status(500).json({
@@ -192,8 +208,6 @@ app.patch("/tasks/:id", async (_req, res) => {
       });
     }
   }
-
-  // TODO: update updated time here
 });
 
 app.delete("/tasks/:id", async (_req, res) => {
@@ -239,4 +253,10 @@ initializeDatabase()
     console.error("Server startup failed: ", error);
     process.exit(1);
   });
+
+
+
+// app.listen(env.port, () => {
+//   console.log(`Server running at http://localhost:${env.port}`);
+// });
 
