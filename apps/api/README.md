@@ -18,20 +18,17 @@ docker-compose up -d
 ```
 
 ## How to create the database tables  
-Run the schema file against the local database after PostgreSQL is running:  
-```bash
-psql postgresql://postgres:postgres@localhost:5432/cs453 -f database/schema.sql
-```
+The server does this automatically through the function ```initializeDatabase()```. There are no special steps for the user to take.  
 
 ## How to start the server  
 ```bash
 npm run dev
 ```
-The server runs on 
+The server runs on ```http://localhost:3000```.   
 
 ## How to run tests  
 ```bash
-npm test ?????
+npm test
 ```
 
 ## What routes your API supports  
@@ -52,14 +49,14 @@ GET /health:
 curl http://localhost:3000/health
 ```
 Output:  
-```{"status":"ok"}```
+```{"status":"ok", "service":"cs453-api"}```
 <br><br><br>
 GET /db-health:  
 ```bash
 curl http://localhost:3000/db-health
 ```
 Output:  
-```{???}```
+```{"status":"ok","database":"connected","currentTime":"2026-07-14T23:21:33.897Z"}```
 <br><br><br>
 POST /tasks:  
 ```bash
@@ -68,62 +65,59 @@ curl -X POST http://localhost:3000/tasks \
   -d '{"title": "Complete lab 03", "description": "Rest API", "status": "todo"}'
 ```
 Output:  
-```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+```{"task":{"id":1,"title":"Complete lab 03","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-14T23:54:22.215Z"}}```
 <br><br><br>
 GET /tasks:  
 ```bash
 curl http://localhost:3000/tasks
 ```
 Output:  
-```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+```{"task":{"id":1,"title":"Complete lab 03","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-14T23:54:22.215Z"}}```
 <br><br><br>
 GET /tasks/:id:  
 ```bash
-curl http://localhost:3000/tasks/2
+curl http://localhost:3000/tasks/1
 ```
 Output:  
-```{"id":2,"title":"Complete lab 03","description":"Rest API","status":"todo"}```
+```[{"id":1,"title":"Complete lab 03","description1":"Rest API","status1":"todo","createdAt":"2026-07-14T23:54:22.215Z","updatedAt":"2026-07-14T23:54:22.215Z"}]```
 <br><br><br>
 PATCH /tasks/:id:  
 ```bash
-curl -X PATCH http://localhost:3000/tasks/2 \
+curl -X PATCH http://localhost:3000/tasks/1 \
   -H "Content-Type: application/json" \
   -d '{"title": "Final exam"}'
 ```
 Output:  
-```{"id":2,"title":"Final exam","description":"Rest API","status":"todo"}```
+```{"tasks":[{"id":1,"title":"Final exam","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:02:48.932Z"}]}```
 <br><br><br>
 PATCH /tasks/:id:  
 ```bash
-curl -X PATCH http://localhost:3000/tasks/2 \
+curl -X PATCH http://localhost:3000/tasks/1 \
   -H "Content-Type: application/json" \
   -d '{"description": "Cumulative final exam"}'
 ```
 Output:  
-```{"id":2,"title":"Final exam","description":"Cumulative final exam","status":"todo"}```
+```{"tasks":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:13.758Z"}}```
 <br><br><br>
 PATCH /tasks/:id:  
 ```bash
-curl -X PATCH http://localhost:3000/tasks/2 \
+curl -X PATCH http://localhost:3000/tasks/1 \
   -H "Content-Type: application/json" \
   -d '{"status": "completed"}'
 ```
 Output: 
-```{"id":2,"title":"Final exam","description":"Cumulative final exam","status":"completed"}```
-<br><br><br>
-PATCH /tasks/:id:  
-```bash
-curl -X PATCH http://localhost:3000/tasks/2 \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Midterm", "description": "Midterm exam covering modules 1-3"}'
-```
-Output:  
-```{"id":2,"title":"Midterm","description":"Midterm exam covering modules 1-3","status":"completed"}```
+```{"tasks":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"completed","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:37.967Z"}}```
 <br><br><br>
 DELETE /tasks/:id:  
 ```bash
-curl -X DELETE http://localhost:3000/tasks/2
+curl -X DELETE http://localhost:3000/tasks/1
 ```
+GET /tasks:
+```bash
+curl http://localhost:3000/tasks
+```
+Output:  
+```[]```  
 
 ## Reflection Questions
 
@@ -150,3 +144,4 @@ the one the user entered. We then return the row[s] that correspond with the req
 CHECK AND SEE WHAT HAPPENS, WHAT CODE IS RETURNED, ETC.  
 
 **5. What was the hardest part of connecting the API to PostgreSQL?**  
+I ran into an issue with the keywords "description" and "status" in schema.sql. They were showing up as red text in my IDE, meaning SQL was reading them in as special keywords. I changed them to "description1" and "status1" which is a little unfortunate using curl requests, but the user won't be able to see these keywords once I connect a client to filter responses.  
