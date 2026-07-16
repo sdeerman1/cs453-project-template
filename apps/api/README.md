@@ -138,7 +138,8 @@ Applications are constantly being changed or updated and separating the logic al
 400: Bad Request (information they entered was incorrect)  
 404: Not found (the request they entered was not a valid route)  
 500: Database connection failed  
-These are standard HTTP status codes that are universally understood to mean what I used them for. I used 200 for GET /tasks, GET /tasks/:id, and PATCH /tasks/:id.  
+These are standard HTTP status codes that are universally understood to mean what I used them for.  
+I used 200 for GET /tasks, GET /tasks/:id, and PATCH /tasks/:id.  
 I used 201 for POST /tasks.  
 I used 204 for DELETE /tasks/:id.  
 I used 400 for POST and PATCH requests if the data the user entered was insufficient.  
