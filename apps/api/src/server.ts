@@ -37,8 +37,8 @@ app.get("/tasks", async (_req, res) => {
 		const result = await pool.query(
 			`SELECT id,
               title,
-              description1,
-              status1,
+              description,
+              status,
               created_at AS "createdAt",
               updated_at AS "updatedAt"
         FROM tasks
@@ -61,8 +61,8 @@ app.get("/tasks/:id", async (_req, res) => {
 		const result = await pool.query(
 			`SELECT id,
               title,
-              description1,
-              status1,
+              description,
+              status,
               created_at AS "createdAt",
               updated_at AS "updatedAt"
         FROM tasks
@@ -98,9 +98,9 @@ app.post("/tasks", async (_req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO tasks (title, description1, status1)
+      `INSERT INTO tasks (title, description, status)
       VALUES ($1, $2, $3)
-      RETURNING id, title, description1, status1, created_at, updated_at`,
+      RETURNING id, title, description, status, created_at, updated_at`,
       [title, description, status]
     )
     res.status(201).json({ task: result.rows[0] });
@@ -129,7 +129,7 @@ app.patch("/tasks/:id", async (_req, res) => {
         `UPDATE tasks
         SET title = $1, updated_at = CURRENT_TIMESTAMP
         WHERE id = $2
-        RETURNING id, title, description1, status1, created_at, updated_at`,
+        RETURNING id, title, description, status, created_at, updated_at`,
         [title, requestedID]
       );
 
@@ -137,7 +137,7 @@ app.patch("/tasks/:id", async (_req, res) => {
         return res.status(404).json({ error: "Task not found" });
       }
 
-      res.json({ task: result.rows[0] });
+      res.status(200).json({ task: result.rows[0] });
     } catch (error) {
       console.error("Failed to load items:", error);
       res.status(500).json({
@@ -158,9 +158,9 @@ app.patch("/tasks/:id", async (_req, res) => {
     try {
       const result = await pool.query(
         `UPDATE tasks
-        SET description1 = $1, updated_at = CURRENT_TIMESTAMP
+        SET description = $1, updated_at = CURRENT_TIMESTAMP
         WHERE id = $2
-        RETURNING id, title, description1, status1, created_at, updated_at`,
+        RETURNING id, title, description, status, created_at, updated_at`,
         [description, requestedID]
       );
 
@@ -189,9 +189,9 @@ app.patch("/tasks/:id", async (_req, res) => {
     try {
       const result = await pool.query(
         `UPDATE tasks
-        SET status1 = $1, updated_at = CURRENT_TIMESTAMP
+        SET status = $1, updated_at = CURRENT_TIMESTAMP
         WHERE id = $2
-        RETURNING id, title, description1, status1, created_at, updated_at`,
+        RETURNING id, title, description, status, created_at, updated_at`,
         [status, requestedID]
       );
 
@@ -235,7 +235,7 @@ app.use((_req, res) => {
 
 async function initializeDatabase() {
   try {
-    const filePath = path.join("../../database", 'schema.sql');
+    const filePath = path.join('../../database', 'schema.sql');
     const sql = fs.readFileSync(filePath, 'utf8');
     await pool.query(sql);
   } catch (error) {

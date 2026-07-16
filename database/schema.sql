@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    description1 TEXT,
-    status1 TEXT NOT NULL DEFAULT 'todo',
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'todo',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
