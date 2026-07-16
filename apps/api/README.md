@@ -72,7 +72,7 @@ GET /tasks:
 curl http://localhost:3000/tasks
 ```
 Output:  
-```{"task":{"id":1,"title":"Complete lab 03","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-14T23:54:22.215Z"}}```
+```[{"id":1,"title":"Complete lab 03","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-14T23:54:22.215Z"}]```
 <br><br><br>
 GET /tasks/:id:  
 ```bash
@@ -88,7 +88,7 @@ curl -X PATCH http://localhost:3000/tasks/1 \
   -d '{"title": "Final exam"}'
 ```
 Output:  
-```{"tasks":[{"id":1,"title":"Final exam","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:02:48.932Z"}]}```
+```{"task":{"id":1,"title":"Final exam","description1":"Rest API","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:02:48.932Z"}}```
 <br><br><br>
 PATCH /tasks/:id:  
 ```bash
@@ -97,7 +97,7 @@ curl -X PATCH http://localhost:3000/tasks/1 \
   -d '{"description": "Cumulative final exam"}'
 ```
 Output:  
-```{"tasks":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:13.758Z"}}```
+```{"task":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"todo","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:13.758Z"}}```
 <br><br><br>
 PATCH /tasks/:id:  
 ```bash
@@ -106,7 +106,7 @@ curl -X PATCH http://localhost:3000/tasks/1 \
   -d '{"status": "completed"}'
 ```
 Output: 
-```{"tasks":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"completed","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:37.967Z"}}```
+```{"task":{"id":1,"title":"Final exam","description1":"Cumulative final exam","status1":"completed","created_at":"2026-07-14T23:54:22.215Z","updated_at":"2026-07-15T00:03:37.967Z"}}```
 <br><br><br>
 DELETE /tasks/:id:  
 ```bash
