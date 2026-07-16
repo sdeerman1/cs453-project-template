@@ -27,6 +27,7 @@ npm run dev
 The server runs on ```http://localhost:3000```.   
 
 ## How to run tests  
+In a different terminal also pointing to ```cs453-project-template/apps/api```
 ```bash
 npm test
 ```
@@ -131,12 +132,18 @@ This aligns with the computer science principle the Separation of Concerns. Sepa
 Applications are constantly being changed or updated and separating the logic allows for much easier maintenance. It also makes the application more scalable, and allows for easier testing as well.  
 
 **3. What HTTP status codes did you use, and why?**  
-200:  
+200: OK  
 201: Item created  
 204: Successful deletion  
 400: Bad Request (information they entered was incorrect)  
 404: Not found (the request they entered was not a valid route)  
-500: database connection failed  
+500: Database connection failed  
+These are standard HTTP status codes that are universally understood to mean what I used them for. I used 200 for GET /tasks, GET /tasks/:id, and PATCH /tasks/:id.  
+I used 201 for POST /tasks.  
+I used 204 for DELETE /tasks/:id.  
+I used 400 for POST and PATCH requests if the data the user entered was insufficient.  
+I used 404 for if the ID that was entered was an invalid ID or if the route was incorrect.  
+I used 500 for any request that the database failed for.  
 
 **4. What happens when a client requests a task ID that does not exist?**  
 The client will send a fetch GET/http://localhost:3000/api/tasks/id. This tells the server to run the get() function. Using id = what the user input, the server runs an SQL query "SELECT * FROM tasks WHERE id = $1", [requestedID] which means we will select all columns from the tasks table where the ID matches
@@ -144,4 +151,7 @@ the one the user entered. We then return the row[s] that correspond with the req
 CHECK AND SEE WHAT HAPPENS, WHAT CODE IS RETURNED, ETC.  
 
 **5. What was the hardest part of connecting the API to PostgreSQL?**  
-I ran into an issue with the keywords "description" and "status" in schema.sql. They were showing up as red text in my IDE, meaning SQL was reading them in as special keywords. I changed them to "description1" and "status1" which is a little unfortunate using curl requests, but the user won't be able to see these keywords once I connect a client to filter responses.  
+I ran into an issue with the keywords "description" and "status" in schema.sql. They were showing up as red text in my IDE, and I thought SQL was reading them in as special keywords. I changed them to "description1" and "status1", but ended up changing them back once I realized they were being read correctly. 
+
+## Notes  
+I did not end up moving my logic out of the main server file. I was already having some issues with the file structure, and I did not feel I had the time or resources to complete this successfully. If we have an example of separation of concerns in class that shows what logic should go where, I will feel confident enough to separate my server.ts file for the subsequent checkpoints. For now, all the server logic is in ```cs453-project-template/apps/api/src/server.ts```.   
