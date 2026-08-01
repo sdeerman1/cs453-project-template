@@ -1,12 +1,24 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { env } from "./config/env";
 import { pool } from "./db/pool";
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { AppError } from './errors';
+
+import authRoutes from "./routes/authRoutes";
+import taskRoutes from "./routes/taskRoutes";
+import projectRoutes from "./routes/projectRoutes";
+import userRoutes from "./routes/userRoutes";
+
 export const app = express();
 
 app.use(express.json());
+
+app.use("/auth", authRoutes);
+app.use("/tasks", taskRoutes);
+app.use("/projects", projectRoutes);
+app.use("/users", userRoutes);
 
 app.get("/health", (_req, res) => {
 	res.json({
@@ -32,209 +44,13 @@ app.get("/db-health", async (_req, res) => {
 	}
 });
 
-app.get("/tasks", async (_req, res) => {
-	try {
-		const result = await pool.query(
-			`SELECT id,
-              title,
-              description,
-              status,
-              created_at AS "createdAt",
-              updated_at AS "updatedAt"
-        FROM tasks
-        ORDER BY id `,
-		);
-
-		res.status(200).json(result.rows);
-	} catch (error) {
-		console.error("Failed to fetch tasks:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch tasks",
-		});
-	}
-});
-
-app.get("/tasks/:id", async (_req, res) => {
-  const requestedID = Number(_req.params.id);
-	try {
-		const result = await pool.query(
-			`SELECT id,
-              title,
-              description,
-              status,
-              created_at AS "createdAt",
-              updated_at AS "updatedAt"
-        FROM tasks
-        WHERE id = $1`,
-        [requestedID]
-		);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-
-		res.status(200).json( result.rows[0] );
-	} catch (error) {
-		console.error("Failed to fetch tasks:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch tasks",
-		});
-	}
-});
-
-app.post("/tasks", async (_req, res) => {
-  const title = _req.body?.title?.trim();
-  const description = _req.body?.description?.trim();
-  const status = _req.body?.status?.trim();
-
-  if (!title || !status) {
-    return res.status(400).json({
-      error: "Bad Request",
-      message: "A title and status are required."
-    });
-  }
-
-  try {
-    const result = await pool.query(
-      `INSERT INTO tasks (title, description, status)
-      VALUES ($1, $2, $3)
-      RETURNING id, title, description, status, created_at, updated_at`,
-      [title, description, status]
-    )
-    res.status(201).json({ task: result.rows[0] });
-  } catch (error) {
-    console.error("Failed to add item: ", error);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: "Failed to add item."
-    });
-  }
-});
-
-app.patch("/tasks/:id", async (_req, res) => {
-  const requestedID = Number(_req.params.id);
-
-  if ("title" in _req.body) {
-    const title = _req.body?.title?.trim();
-    if (!title) {
-      return res.status(400).json({
-        error: "Bad Request",
-        message: "A title is required."
-      });
-    }
-    try {
-      const result = await pool.query(
-        `UPDATE tasks
-        SET title = $1, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $2
-        RETURNING id, title, description, status, created_at, updated_at`,
-        [title, requestedID]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Task not found" });
-      }
-
-      res.status(200).json({ task: result.rows[0] });
-    } catch (error) {
-      console.error("Failed to load items:", error);
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to load items."
-      });
-    }
-  }
-
-  if ("description" in _req.body) {
-    const description = _req.body?.description?.trim();
-    if (!description) {
-      return res.status(400).json({
-        error: "Bad Request",
-        message: "A description is required."
-      });
-    }
-    try {
-      const result = await pool.query(
-        `UPDATE tasks
-        SET description = $1, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $2
-        RETURNING id, title, description, status, created_at, updated_at`,
-        [description, requestedID]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Task not found" });
-      }
-
-      res.status(200).json({ task: result.rows[0] });
-    } catch (error) {
-      console.error("Failed to load items:", error);
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to load items."
-      });
-    }
-  }
-
-  if ("status" in _req.body) {
-    const status = _req.body?.status?.trim();
-    if (!status) {
-      return res.status(400).json({
-        error: "Bad Request",
-        message: "A status is required."
-      });
-    }
-    try {
-      const result = await pool.query(
-        `UPDATE tasks
-        SET status = $1, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $2
-        RETURNING id, title, description, status, created_at, updated_at`,
-        [status, requestedID]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Task not found" });
-      }
-
-      res.status(200).json({ task: result.rows[0] });
-    } catch (error) {
-      console.error("Failed to load items:", error);
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to load items."
-      });
-    }
-  }
-});
-
-app.delete("/tasks/:id", async (_req, res) => {
-  const requestedID = Number(_req.params.id);
-  try {
-    const result = await pool.query(
-      `DELETE FROM tasks
-      WHERE id = $1`,
-      [requestedID]
-    );
-
-    res.status(204).json({ status: "Successfully deleted" });
-  } catch (error) {
-    console.error("Failed to load items:", error);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message: "Failed to load items."
-    });
-  }
-});
-
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found." });
 });
 
 async function initializeDatabase() {
   try {
+    // await pool.query(`DROP TABLE users CASCADE`);
     const filePath = path.join('../../database', 'schema.sql');
     const sql = fs.readFileSync(filePath, 'utf8');
     await pool.query(sql);
@@ -254,6 +70,20 @@ initializeDatabase()
     process.exit(1);
   });
 
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      error: err.message,
+    });
+  }
+
+  // Unhandled/Unexpected errors (e.g. Database connection failure) -> default to 500
+  console.error('Unhandled Error:', err);
+  return res.status(500).json({
+    error: 'Internal Server Error',
+  });
+});
 
 
 // app.listen(env.port, () => {
