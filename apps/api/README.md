@@ -239,6 +239,10 @@ Basically, each project has an owner and also has tasks associated with it. Each
 **7. What was the hardest part of adding authentication or authorization?**  
 The hardest part was figuring out how to configure the JWT so that I could access the user's ID as a number. I had to change the code from class slightly to ensure that req.user had fields id (which was a number), name, and role and that these fields could be accessed throughout the application. This allowed me to check the user's role for authorization of admin-only routes as well as the user's ID to compare to the project owner's ID for authorization of update and delete routes.  
 
+# Graduate Extension
+
+The graduate extension write-up is stored in ```lessons-learned.md```, located in the ```cs453-project-template/apps/api``` folder.
+
 # Test Plan
 
 Before running this test plan, ensure you have reset the database and created the admin using the script. These commands will be:
