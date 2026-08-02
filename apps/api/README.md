@@ -313,6 +313,16 @@ Output:
 ```{"error":"Username and password are required."}```
 <br><br><br>
 
+Attempt to login with an incorrect password (POST /auth/login):
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "user", "password": "userpassword"}'
+```
+Output:  
+```{"error":"Invalid username or password."}```
+<br><br><br>
+
 Login (POST /auth/login):
 ```bash
 curl -X POST http://localhost:3000/auth/login \
